@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Presente Digital - Dia dos Namorados</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Roboto:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #2d1e3a 0%, #4e2e57 100%);
+      background-image:
+        url('https://www.transparenttextures.com/patterns/diamond-upholstery.png'),
+        radial-gradient(ellipse at top left, #a18cd1 0%, transparent 70%),
+        radial-gradient(ellipse at bottom right, #fbc2eb 0%, transparent 70%);
+      background-blend-mode: overlay;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .container {
+      position: relative;
+      width: 420px;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+    }
+    .envelope-container {
+      position: relative;
+      width: 340px;
+      height: 220px;
+      margin-top: 60px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 3;
+      transition: filter 0.3s;
+    }
+    .envelope-container.opened {
+      pointer-events: none;
+      filter: blur(1.5px) brightness(0.8);
+    }
+    .envelope-label {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 2px 2px 8px #000, 0 0 8px #a18cd1;
+      letter-spacing: 2px;
+      text-align: center;
+      z-index: 10;
+      user-select: none;
+      pointer-events: none;
+    }
+    .envelope-svg {
+      width: 340px;
+      height: 220px;
+      display: block;
+      z-index: 2;
+    }
+    .envelope-flap {
+      transform-origin: 170px 60px;
+      transition: transform 1s cubic-bezier(.77,0,.18,1.01);
+    }
+    .envelope-container.opened .envelope-flap {
+      transform: rotateX(120deg);
+    }
+    .letter {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      min-height: 420px;
+      max-height: 520px;
+      background: #f9f6e7;
+      border-radius: 18px 18px 28px 28px;
+      box-shadow: 0 8px 32px 0 rgba(60,30,90,0.25), 0 1.5px 0 #e2cfa1;
+      border: 2.5px solid #d2b48c;
+      padding: 38px 32px 30px 32px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.33rem;
+      color: #391d47;
+      font-weight: 600;
+      line-height: 2.2;
+      letter-spacing: 0.6px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+      background-image: url('https://www.transparenttextures.com/patterns/old-mathematics.png');
+      background-blend-mode: multiply;
+      transition: opacity 0.7s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+      overflow: visible;
+      justify-content: flex-start;
+    }
+    .letter.visible {
+      opacity: 1;
+      pointer-events: auto;
+      animation: letterIn 1.2s cubic-bezier(.77,0,.18,1.01);
+    }
+    @keyframes letterIn {
+      0% { transform: translateX(-50%) scale(0.8) translateY(40px); opacity: 0; }
+      100% { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
+    }
+    .letter-content {
+      width: 100%;
+      max-height: 310px;
+      min-height: 170px;
+      white-space: pre-line;
+      text-align: center;
+      font-family: 'Dancing Script', 'Segoe Script', 'Comic Sans MS', cursive, sans-serif;
+      font-size: 1.33rem;
+      color: #391d47;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      line-height: 2.2;
+      text-shadow: 0 1px 10px #f5e9ff, 0 2px 8px #d5a7f5;
+      margin-bottom: 24px;
+      user-select: text;
+      overflow-y: auto;
+      padding-right: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #a18cd1 #f9f6e7;
+      box-sizing: border-box;
+      /* Efeito suave quando aparece/metade rola */
+      transition: box-shadow 0.2s;
+      border-radius: 14px;
+    }
+    .letter-content:focus {
+      outline: 2px dashed #a18cd1;
+    }
+    /* Custom scrollbar for webkit browsers */
+    .letter-content::-webkit-scrollbar {
+      width: 8px;
+      background: #f9f6e7;
+      border-radius: 8px;
+    }
+    .letter-content::-webkit-scrollbar-thumb {
+      background: #a18cd1cc;
+      border-radius: 7px;
+      border: 2px solid #f9f6e7;
+    }
+    .present-btn {
+      display: none;
+      margin-top: 8px;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
+      border: none;
+      border-radius: 24px;
+      box-shadow: 0 2px 12px 0 rgba(60,30,90,0.18);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      outline: none;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 6px #4e2e57;
+      animation: btnPop 0.7s cubic-bezier(.77,0,.18,1.01);
+      align-self: center;
+      position: relative;
+    }
+    .present-btn.show {
+      display: block;
+    }
+    @keyframes btnPop {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .particles {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .particle {
+      position: absolute;
+      width: 24px; height: 24px;
+      opacity: 0.7;
+      pointer-events: none;
+      animation: floatParticle 6s linear infinite;
+    }
+    @keyframes floatParticle {
+      0% { transform: translateY(0) scale(1); opacity: 0.7;}
+      80% { opacity: 0.8;}
+      100% { transform: translateY(-100vh) scale(1.2); opacity: 0;}
+    }
+    @media (max-width: 500px) {
+      .container, .envelope-container, .envelope-svg, .letter {
+        width: 98vw !important;
+        min-width: 0 !important;
+        max-width: 99vw !important;
+      }
+      .letter {
+        min-height: 220px;
+        max-height: 90vh;
+        padding: 18px 6vw 12px 6vw;
+        font-size: 1.03rem;
+      }
+      .letter-content {
+        max-height: 38vh;
+        font-size: 1.08rem;
+        line-height: 1.7;
+      }
+      .envelope-label {
+        font-size: 1.1rem;
+        top: -40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles"></div>
+  <div class="container">
+    <div class="envelope-container" id="envelope">
+      <div class="envelope-label">
+        De <span style="color:#fbc2eb; text-shadow: 0 0 8px #a18cd1;">ÓDIO ETERNO</span> para <span style="color:#a18cd1; text-shadow: 0 0 8px #fbc2eb;">FURIOSA</span>
+      </div>
+      <svg class="envelope-svg" viewBox="0 0 340 220">
+        <polygon class="envelope-flap" points="0,0 340,0 170,120" fill="#e2cfa1" stroke="#bfa76a" stroke-width="3"/>
+        <rect x="0" y="60" width="340" height="120" rx="18" fill="#f9f6e7" stroke="#bfa76a" stroke-width="3"/>
+        <ellipse cx="170" cy="200" rx="120" ry="18" fill="#000" opacity="0.08"/>
+        <polygon points="0,180 340,180 170,220" fill="#e2cfa1" stroke="#bfa76a" stroke-width="3"/>
+        <polyline points="0,60 170,160 340,60" fill="none" stroke="#d2b48c" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="letter" id="letter">
+      <div class="letter-content" id="letterContent" tabindex="0"></div>
+      <button class="present-btn" id="presentBtn">Clique aqui para abrir o presente completo</button>
+    </div>
+  </div>
+  <script>
+    // Texto da carta
+    const letterText = `SEI QUE BRIGAMOS MUITO E QUE SEMPRE ESTOU ERRANDO,
+MAS HOJE É UM DIA IMPORTANTE PRA MIM E PRA VOCÊ TAMBÉM.
+SEI QUE NÃO ESTAMOS NAMORANDO,
+MAS JÁ FAZ ANOS QUE EU TE NAMORO.
+FAZ ANOS QUE EU TE DESEJO E TE QUERO.
+
+MAS MEUS ERROS ME FAZEM FICAR SEM CHÃO,
+E SUA DECEPÇÃO ME CORTA EM PEDAÇOS.
+EU ADMIRO TUDO EM VOCÊ E TUDO O QUE VOCÊ FAZ.
+
+JOGAR COM VOCÊ É A ÚNICA FORMA DE ME MANTER PRÓXIMO A VOCÊ.
+MAS AS BRIGAS ESTÃO ME DEIXANDO MAL.
+SEI QUE A CULPA SEMPRE É MINHA.
+SEI QUE TE FAÇO MAL.
+
+SE EXISTISSE UM ELIXIR QUE CURASSE SUA ASMA,
+VOCÊ PODE TER CERTEZA QUE EU IRIA EM BUSCA DELE.
+EU SUBIRIA ATÉ O NÍVEL 100 DA TORRE,
+ENFRENTANDO UM MILHÃO DE DEMÔNIOS POR VOCÊ.
+
+POIS VOCÊ É QUEM EU QUERO,
+É QUEM EU AMO,
+E É QUEM EU SEMPRE AMEI.
+
+💌 Feliz Dia dos Namorados, minha pessoa especial. 💌`;
+    // Envelope click
+    const envelope = document.getElementById('envelope');
+    const letter = document.getElementById('letter');
+    const letterContent = document.getElementById('letterContent');
+    const presentBtn = document.getElementById('presentBtn');
+    let opened = false;
+    envelope.addEventListener('click', () => {
+      if (opened) return;
+      opened = true;
+      envelope.classList.add('opened');
+      setTimeout(() => {
+        letter.classList.add('visible');
+        typeWriter(letterText, letterContent, 0, 28);
+      }, 900);
+    });
+    function typeWriter(text, el, i, speed) {
+      if (i === 0) el.textContent = '';
+      if (i < text.length) {
+        el.textContent += text[i];
+        let nextSpeed = speed;
+        if (text[i] === '\n') nextSpeed = 350;
+        else if (/[,.!?]/.test(text[i])) nextSpeed = 120;
+        else if (text[i] === '💌') nextSpeed = 400;
+        else nextSpeed = 28 + Math.random() * 30;
+        setTimeout(() => typeWriter(text, el, i + 1, speed), nextSpeed);
+        // Auto scroll down conforme digita
+        el.scrollTop = el.scrollHeight;
+      } else {
+        setTimeout(() => presentBtn.classList.add('show'), 600);
+      }
+    }
+    function createParticles() {
+      const particles = document.querySelector('.particles');
+      const colors = ['#fbc2eb', '#a18cd1', '#fff', '#e2cfa1'];
+      for (let i = 0; i < 22; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = (Math.random() * 60 + 30) + 'vh';
+        p.style.animationDelay = (Math.random() * 6) + 's';
+        p.style.opacity = 0.5 + Math.random() * 0.5;
+        p.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24">
+          <path d="M12 21s-6.5-5.2-9-8.5C-1.5 7.5 3.5 2.5 8 6c1.7 1.4 2.5 2.5 4 4.5C13.5 8.5 14.3 7.4 16 6c4.5-3.5 9.5 1.5 5 6.5C18.5 15.8 12 21 12 21z"
+            fill="${colors[Math.floor(Math.random()*colors.length)]}" />
+        </svg>`;
+        particles.appendChild(p);
+      }
+    }
+    createParticles();
+    presentBtn.addEventListener('click', () => {
+      alert('Aqui você pode continuar o presente! (Exemplo: abrir as 6 caixas)');
+    });
+  </script>
+</body>
+</html>
